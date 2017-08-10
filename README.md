@@ -1,4 +1,4 @@
-# Intervalometer for Samsung NX500 with web interface.
+# Intervalometer with web interface for Samsung NX500.
 
 This app is for installing into the camera.
 
