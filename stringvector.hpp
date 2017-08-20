@@ -1,7 +1,7 @@
 /**
  * @file
  * 
- * Runs a websocket server.
+ * A vector of strings.
  *
  * @date 2017-08-20
  * @uthor Francisco J. Lazur

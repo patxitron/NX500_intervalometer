@@ -38,8 +38,8 @@ typedef enum {
  * It follows the traditional convention of doing two forks and detach the forked
  * function from controlling terminal.
  * 
- * Note that if an empty daemon_name is provided, no pid file is created and no
- * cheking of uniqueness is performed.
+ * Note that if an empty daemon_name is provided, no persistent pid file is
+ * created and no cheking of uniqueness is performed.
  *
  * @param daemon_name Name of the daemon. If it is not empty, it creates a file
  *                    /var/run/<daemon_name>.pid and checks that no other daemon

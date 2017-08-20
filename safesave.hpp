@@ -1,7 +1,7 @@
 /**
  * @file
  * 
- * Runs a websocket server.
+ * Atomically save to a file.
  *
  * @date 2017-08-20
  * @uthor Francisco J. Lazur
@@ -26,7 +26,7 @@ namespace patxitron {
  * @param data Data to write, must be of a streamable type.
  * @param filename File name and path to be writen. If empty, a temporary one
  *                 in /tmp is created.
- * @return filename of the wrote file if successful, empty string otherwise.
+ * @return filename of the writen file if successful, empty string otherwise.
  */
 template<typename T>
 ::std::string safeSave(T const& data

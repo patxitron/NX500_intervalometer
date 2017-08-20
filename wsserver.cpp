@@ -18,7 +18,7 @@ void wsServer(stringvector const& args)
     }
     size_t counter = 0;
     while (true) {
-        syslog(LOG_ERR | LOG_DAEMON, "DEMONIO: %s <%u>", holamundo_args.c_str(), counter);
+        syslog(LOG_ERR | LOG_DAEMON, "DAEMON: %s <%u>", holamundo_args.c_str(), counter);
         counter += 1;
         sleep(5);
     }

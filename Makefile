@@ -3,7 +3,7 @@ COMPILER_PREFIX := $(PROJECT_DIR)/buildroot/output/host/usr/bin/arm-buildroot-li
 SYSROOT := $(PROJECT_DIR)/buildroot/output/host/arm-buildroot-linux-musleabi/sysroot
 STRIP = $(COMPILER_PREFIX)strip
 STRIPFLAGS = --strip-all
-CXXFLAGS = -std=c++11 -pedantic -Wall -Wno-format -Wno-unused-result -fmessage-length=0 -static -I $(PROJECT_DIR)/websocketpp -I $(PROJECT_DIR)/rapidjson
+CXXFLAGS = -std=c++11 -pedantic -Wall -Wno-format -Wno-unused-result -fmessage-length=0 -static -I $(PROJECT_DIR)/websocketpp -I $(PROJECT_DIR)/rapidjson/include
 OPTFLAGS = -O2
 DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
@@ -24,11 +24,14 @@ release: CXXFLAGS := $(OPTFLAGS) $(CXXFLAGS)
 release: $(TARGET)
 	$(STRIP) $(STRIPFLAGS) $(TARGET)
 
-$(TARGET): $(STRIP) $(PROJECT_DIR)/websocketpp/websocketpp/version.hpp $(OBJS)
+$(TARGET): $(STRIP) $(PROJECT_DIR)/websocketpp/websocketpp/version.hpp $(PROJECT_DIR)/rapidjson/include/rapidjson/rapidjson.h $(OBJS)
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(OBJS) $(LIBS)
 
 $(PROJECT_DIR)/websocketpp/websocketpp/version.hpp:
 	$(PROJECT_DIR)/get-wspp.sh
+
+$(PROJECT_DIR)/rapidjson/include/rapidjson/rapidjson.h:
+	$(PROJECT_DIR)/get-rapidjson.sh
 
 $(STRIP):
 	$(PROJECT_DIR)/do-buildroot.sh

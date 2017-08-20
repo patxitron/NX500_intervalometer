@@ -29,18 +29,18 @@ int main(int argc, char* argv[])
             holamundo_args += "'";
         }
     }
-    std::cout << "Hola mundo" << holamundo_args << "\n" << holamundo_args << std::endl;
+    std::cout << "Hello world" << holamundo_args << "\n" << holamundo_args << std::endl;
     patxitron::daemonize_result daemoinized = patxitron::daemonize(
          "IntervalometerWS"
         ,std::bind(&patxitron::wsServer, args)
     );
     if (daemoinized != patxitron::DAEMON_ERROR) {
         for (size_t i = 10; i > 0; i--) {
-            std::cout << "Endemoniado, saliendo en " << i << " segundos" << std::endl;
+            std::cout << "Daemonized, exiting in " << i << " seconds" << std::endl;
             sleep(1);
         }
     } else {
-        std::cerr << "Error iniciando demonio" << std::endl;
+        std::cerr << "Error starting daemon" << std::endl;
         return 1;
     }
     return 0;
