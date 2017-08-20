@@ -3,15 +3,15 @@ COMPILER_PREFIX := $(PROJECT_DIR)/buildroot/output/host/usr/bin/arm-buildroot-li
 SYSROOT := $(PROJECT_DIR)/buildroot/output/host/arm-buildroot-linux-musleabi/sysroot
 STRIP = $(COMPILER_PREFIX)strip
 STRIPFLAGS = --strip-all
-CXXFLAGS = -std=c++11 -pedantic -Wall -Wno-format -Wno-unused-result -fmessage-length=0 -static -I $(PROJECT_DIR)/websocketpp
+CXXFLAGS = -std=c++11 -pedantic -Wall -Wno-format -Wno-unused-result -fmessage-length=0 -static -I $(PROJECT_DIR)/websocketpp -I $(PROJECT_DIR)/rapidjson
 OPTFLAGS = -O2
 DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
 CXX := $(COMPILER_PREFIX)g++
 
-OBJS := main.o
+OBJS := main.o wsserver.o
 
-LIBS = $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a
+LIBS = $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a $(SYSROOT)/usr/lib/libX11.a
 
 TARGET = intervalometer
 

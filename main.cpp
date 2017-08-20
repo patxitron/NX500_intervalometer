@@ -4,16 +4,22 @@
  * Program entry point.
  */
 
+#define _BSD_SOURCE
+
 #include <string>
 #include <vector>
 #include <iostream>
+#include <functional>
+#include "daemonize.hpp"
+#include "wsserver.hpp"
+#include "stringvector.hpp"
 
-typedef std::vector<std::string> stringlist;
+
 
 int main(int argc, char* argv[])
 {
     std::string holamundo_args;
-    stringlist args;
+    patxitron::stringvector args;
     if (argc > 1) {
         args.insert(args.begin(), argv + 1, argv + argc);
         for (auto const& arg: args) {
@@ -23,6 +29,19 @@ int main(int argc, char* argv[])
             holamundo_args += "'";
         }
     }
-    std::cout << "Hola mundo" << holamundo_args << std::endl;
+    std::cout << "Hola mundo" << holamundo_args << "\n" << holamundo_args << std::endl;
+    patxitron::daemonize_result daemoinized = patxitron::daemonize(
+         "IntervalometerWS"
+        ,std::bind(&patxitron::wsServer, args)
+    );
+    if (daemoinized != patxitron::DAEMON_ERROR) {
+        for (size_t i = 10; i > 0; i--) {
+            std::cout << "Endemoniado, saliendo en " << i << " segundos" << std::endl;
+            sleep(1);
+        }
+    } else {
+        std::cerr << "Error iniciando demonio" << std::endl;
+        return 1;
+    }
     return 0;
 }
