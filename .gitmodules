@@ -4,6 +4,7 @@
 [submodule "buildroot"]
 	path = buildroot
 	url = git://git.buildroot.net/buildroot
+	branch = 2017.05.x
 [submodule "rapidjson"]
 	path = rapidjson
 	url = https://github.com/miloyip/rapidjson.git
