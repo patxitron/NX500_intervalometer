@@ -11,7 +11,7 @@
 #include <iostream>
 #include <functional>
 #include "daemonize.hpp"
-#include "wsserver.hpp"
+#include "startwsserver.hpp"
 #include "stringvector.hpp"
 
 
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     std::cout << "Hello world" << holamundo_args << "\n" << holamundo_args << std::endl;
     patxitron::daemonize_result daemoinized = patxitron::daemonize(
          "IntervalometerWS"
-        ,std::bind(&patxitron::wsServer, args)
+        ,std::bind(&patxitron::startWsServer, args)
     );
     if (daemoinized != patxitron::DAEMON_ERROR) {
         for (size_t i = 10; i > 0; i--) {

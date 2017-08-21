@@ -9,7 +9,7 @@ DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
 CXX := $(COMPILER_PREFIX)g++
 
-OBJS := main.o wsserver.o
+OBJS := main.o startwsserver.o
 
 LIBS = $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a $(SYSROOT)/usr/lib/libX11.a
 

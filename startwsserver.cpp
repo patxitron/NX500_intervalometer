@@ -7,7 +7,7 @@
 
 namespace patxitron {
 
-void wsServer(stringvector const& args)
+void startWsServer(stringvector const& args)
 {
     ::std::string holamundo_args;
     for (auto const& arg: args) {

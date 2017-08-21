@@ -15,7 +15,7 @@
 
 namespace patxitron {
 
-void wsServer(stringvector const& args);
+void startWsServer(stringvector const& args);
 
 } // namespace patxitron
 
