@@ -45,8 +45,9 @@ typedef enum {
  *                    /var/run/<daemon_name>.pid and checks that no other daemon
  *                    of the same name is already running.
  * @param forked_func Function to be called once daemonized.
+ * @param args        Arguments to pass to the forked_func.
  *
- * @return true if the daemon is successfully created, false otherwise.
+ * @return status of the daemon.
  */
 template<typename FUNC, typename... ARGS>
 daemonize_result daemonize(::std::string const& daemon_name
