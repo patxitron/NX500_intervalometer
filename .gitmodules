@@ -1,11 +1,7 @@
-[submodule "websocketpp"]
-	path = websocketpp
-	url = https://github.com/zaphoyd/websocketpp.git
 [submodule "buildroot"]
 	path = buildroot
 	url = git://git.buildroot.net/buildroot
 	branch = 2017.05.x
-[submodule "rapidjson"]
-	path = rapidjson
-	url = https://github.com/miloyip/rapidjson.git
-	branch = version1.1.0
+[submodule "xdotool"]
+	path = xdotool
+	url = https://github.com/jordansissel/xdotool.git

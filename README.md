@@ -1,4 +1,4 @@
-# Intervalometer with web interface for Samsung NX500.
+# Intervalometer for the "bulb" mode of Samsung NX500.
 
 This app is for installing into the camera.
 

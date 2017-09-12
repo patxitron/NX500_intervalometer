@@ -5,21 +5,20 @@ PKGCONFIG := $(PROJECT_DIR)/buildroot/output/host/usr/bin/pkg-config
 FLKTCONFIG := $(SYSROOT)/usr/bin/fltk-config
 STRIP = $(COMPILER_PREFIX)strip
 STRIPFLAGS = --strip-all
-CXXFLAGS = -std=c++11 -pedantic -Wall -Wno-format -Wno-unused-result \
+CXXFLAGS = -std=c++14 -pedantic -Wall -Wno-format -Wno-unused-result \
            -fmessage-length=0 -static -D DO_FLTK_EXAMPLE \
-           -I $(PROJECT_DIR)/websocketpp -I $(PROJECT_DIR)/rapidjson/include \
-           -I $(SYSROOT)/usr/include
+           -I $(PROJECT_DIR)/xdotool -I $(SYSROOT)/usr/include
 OPTFLAGS = -O2
 DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
 CXX := $(COMPILER_PREFIX)g++
 
 OBJS := main.o #startwsserver.o
-LIBS = $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a \
+LIBS = xdotool/libxdo.a $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a \
        $(SYSROOT)/usr/lib/libfltk.a $(SYSROOT)/usr/lib/libfltk_forms.a \
        $(SYSROOT)/usr/lib/libfltk_images.a $(SYSROOT)/usr/lib/libXft.a \
        $(SYSROOT)/usr/lib/libfontconfig.a $(SYSROOT)/usr/lib/libfreetype.a \
-       $(SYSROOT)/usr/lib/libexpat.a $(SYSROOT)/usr/lib/libX11.a \
+       $(SYSROOT)/usr/lib/libexpat.a $(SYSROOT)/usr/lib/libX11.a $(SYSROOT)/usr/lib/libxkbcommon.a \
        $(SYSROOT)/usr/lib/libxcb*.a $(SYSROOT)/usr/lib/libXcursor.a \
        $(SYSROOT)/usr/lib/libX11.a $(SYSROOT)/usr/lib/libXcomposite.a \
        $(SYSROOT)/usr/lib/libXdamage.a $(SYSROOT)/usr/lib/libXext.a \
@@ -42,14 +41,11 @@ release: CXXFLAGS := $(OPTFLAGS) $(CXXFLAGS)
 release: $(TARGET)
 	$(STRIP) $(STRIPFLAGS) $(TARGET)
 
-$(TARGET): $(STRIP) $(PROJECT_DIR)/websocketpp/websocketpp/version.hpp $(PROJECT_DIR)/rapidjson/include/rapidjson/rapidjson.h $(OBJS)
+$(TARGET): $(STRIP) $(PROJECT_DIR)/xdotool/libxdo.a $(OBJS)
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(OBJS) $(LIBS)
 
-$(PROJECT_DIR)/websocketpp/websocketpp/version.hpp:
-	$(PROJECT_DIR)/get-wspp.sh
-
-$(PROJECT_DIR)/rapidjson/include/rapidjson/rapidjson.h:
-	$(PROJECT_DIR)/get-rapidjson.sh
+$(PROJECT_DIR)/xdotool/libxdo.a:
+	$(PROJECT_DIR)/build-libxdo.sh
 
 $(STRIP):
 	$(PROJECT_DIR)/do-buildroot.sh
