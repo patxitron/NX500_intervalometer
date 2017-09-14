@@ -17,26 +17,37 @@ extern "C" {
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 static void salir(Fl_Widget*,void*) { std::exit(0); }
 
 int main(int argc, char **argv) {
-    xdo_t* xdo = xdo_new(nullptr);
+    xdo_t* xdo = xdo_new(":0");
     xdo_search_t search;
-    Window *list = nullptr;
-    unsigned int n_windows;
-    std::memset(&search, 0, sizeof(xdo_search_t));
-    search.winname = "di-camera-app";
-    search.searchmask = SEARCH_CLASS;
-    search.limit = 1;
-    search.require = xdo_search::SEARCH_ANY;
-    search.only_visible = 0;
-    search.max_depth = 1;
-    if (0 != xdo_search_windows(xdo, &search, &list, &n_windows) || n_windows != 1) {
-        std::cerr << "xdo_window_search failed." << std::endl;
+    Window camera_app_window = 0;
+    if (0 != xdo_get_focused_window(xdo, &camera_app_window)) {
+        std::cerr << "xdo_get_focused_window failed." << std::endl;
         std::exit(1);
     }
-    std::cout << "Found " << n_windows << " windows with di-camera-app class" << std::endl;
+    if (0 != xdo_send_keysequence_window_down(xdo, camera_app_window, "Super_L", 0)) {
+        std::cerr << "xdo_send_keysequence_window_down Super_L failed." << std::endl;
+        std::exit(1);
+    }
+    usleep(100000);
+    if (0 != xdo_send_keysequence_window_down(xdo, camera_app_window, "Super_R", 0)) {
+        std::cerr << "xdo_send_keysequence_window_down Super_R failed." << std::endl;
+        std::exit(1);
+    }
+    usleep(10000000);
+    if (0 != xdo_send_keysequence_window_up(xdo, camera_app_window, "Super_R", 0)) {
+        std::cerr << "xdo_send_keysequence_window_up Super_R failed." << std::endl;
+        std::exit(1);
+    }
+    usleep(100000);
+    if (0 != xdo_send_keysequence_window_up(xdo, camera_app_window, "Super_L", 0)) {
+        std::cerr << "xdo_send_keysequence_window_up Super_L failed." << std::endl;
+        std::exit(1);
+    }
     Fl_Window *window = new Fl_Window(720,480);
     Fl_Button *button = new Fl_Button(10, 390, 700, 80, "SALIR");
     button->callback(salir);
