@@ -23,7 +23,6 @@ static void salir(Fl_Widget*,void*) { std::exit(0); }
 
 int main(int argc, char **argv) {
     xdo_t* xdo = xdo_new(":0");
-    xdo_search_t search;
     Window camera_app_window = 0;
     if (0 != xdo_get_focused_window(xdo, &camera_app_window)) {
         std::cerr << "xdo_get_focused_window failed." << std::endl;
