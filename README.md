@@ -4,9 +4,9 @@ This app is to be installed into the modded camera.
 
 See https://github.com/ottokiksmaler/nx500_nx1_modding
 
-It uses buildroot to make a modern toolchain with C++11 support capable of
-cross-compile to the camera OS. The final binary is statically linked so no
-libraries must be installed on camera.
+It uses buildroot to make a modern toolchain with C++14 support capable of
+cross-compile to the camera OS. The final binary is statically linked so you
+don't need to install any library in the camera.
 
 If buildroot compiling fails at LuaJit with error asm/errno.h: No such file or directory
 you can solve it by installing linux-libc-dev:i386 in your computer, for example
