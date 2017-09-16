@@ -1,6 +1,6 @@
 # Intervalometer for the "bulb" mode of Samsung NX500.
 
-This app is for installing into the camera.
+This app is to be installed into the modded camera.
 
 See https://github.com/ottokiksmaler/nx500_nx1_modding
 
