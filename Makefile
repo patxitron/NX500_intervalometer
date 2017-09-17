@@ -5,15 +5,14 @@ PKGCONFIG := $(PROJECT_DIR)/buildroot/output/host/usr/bin/pkg-config
 FLKTCONFIG := $(SYSROOT)/usr/bin/fltk-config
 STRIP = $(COMPILER_PREFIX)strip
 STRIPFLAGS = --strip-all
-CXXFLAGS = -std=c++14 -pedantic -Wall -Wno-format -Wno-unused-result \
-           -fmessage-length=0 -static -D DO_FLTK_EXAMPLE \
+CXXFLAGS = -std=c++14 -pedantic -Wall -Wno-format -fmessage-length=0 -static \
            -I $(PROJECT_DIR)/xdotool -I $(SYSROOT)/usr/include
 OPTFLAGS = -O2
 DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
 CXX := $(COMPILER_PREFIX)g++
 
-OBJS := main.o #startwsserver.o
+OBJS := main.o spinner.o uintspinner.o #startwsserver.o
 LIBS = xdotool/libxdo.a $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a \
        $(SYSROOT)/usr/lib/libfltk.a $(SYSROOT)/usr/lib/libfltk_forms.a \
        $(SYSROOT)/usr/lib/libfltk_images.a $(SYSROOT)/usr/lib/libXft.a \
