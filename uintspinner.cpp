@@ -3,13 +3,13 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include "util.hpp"
+#include "patxitron_util.hpp"
 
 using namespace std;
 
 namespace {
 
-static uint16_t spinners_value(::std::vector<::std::unique_ptr<patxitron::Spinner>> const& spinners)
+static uint16_t spinners_value(::std::vector<::std::unique_ptr<patxitron::ui::Spinner>> const& spinners)
 {
     uint16_t result = 0;
     uint16_t factor = 1;
@@ -23,7 +23,7 @@ static uint16_t spinners_value(::std::vector<::std::unique_ptr<patxitron::Spinne
 
 } // anonymous
 
-namespace patxitron {
+namespace patxitron { namespace ui {
 
 UintSpinner::UintSpinner(int x, int y, uint16_t minval, uint16_t maxval
                         ,uint16_t val)
@@ -98,4 +98,4 @@ void UintSpinner::spinner_cb(Fl_Widget* cb, void* p)
     reinterpret_cast<UintSpinner*>(p)->spinnercb();
 }
 
-} // patxitron
+}} // patxitron::ui

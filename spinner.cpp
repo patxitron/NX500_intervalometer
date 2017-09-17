@@ -2,7 +2,7 @@
 #include <FL/Fl_Pixmap.H>
 #include <iostream>
 #include <cstring>
-#include "util.hpp"
+#include "patxitron_util.hpp"
 
 using namespace std;
 
@@ -63,7 +63,7 @@ static Fl_Pixmap  down_arrow(down_xpm);
 
 } // anonymous
 
-namespace patxitron {
+namespace patxitron { namespace ui {
 
 Spinner::Spinner(int x, int y, size_t val)
         :Fl_Group(x, y, WIDTH, HEIGHT)
@@ -148,4 +148,4 @@ void Spinner::downcbk(Fl_Widget*, Spinner* spnr)
     spnr->do_callback();
 }
 
-} // patxitron
+}} // patxitron::ui

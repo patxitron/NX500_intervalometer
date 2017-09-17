@@ -3,8 +3,8 @@
  * 
  * 
  */
-#ifndef SPINNER_HPP
-#define SPINNER_HPP
+#ifndef HPP_2d521f88_9b86_11e7_bec9_cfc3241b7d5e
+#define HPP_2d521f88_9b86_11e7_bec9_cfc3241b7d5e
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Button.H>
@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <stdint.h>
 
-namespace patxitron {
+namespace patxitron { namespace ui {
 
 class Spinner: public Fl_Group
 {
@@ -37,6 +37,6 @@ private:
     static void downcbk(Fl_Widget*, Spinner* spnr);
 };
 
-} // patxitron
+}} // patxitron::ui
 
-#endif // SPINNER_HPP
+#endif // HPP_2d521f88_9b86_11e7_bec9_cfc3241b7d5e

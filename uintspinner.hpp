@@ -3,8 +3,8 @@
  * 
  * 
  */
-#ifndef UINTSPINNER_HPP
-#define UINTSPINNER_HPP
+#ifndef HPP_2dca96ac_9b86_11e7_a27d_777393114e5d
+#define HPP_2dca96ac_9b86_11e7_a27d_777393114e5d
 
 #include <FL/Fl_Group.H>
 #include <vector>
@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include "spinner.hpp"
 
-namespace patxitron {
+namespace patxitron { namespace ui {
 
 class UintSpinner: public Fl_Group
 {
@@ -37,6 +37,6 @@ private:
     static void spinner_cb(Fl_Widget* cb, void* p);
 };
 
-} // patxitron
+}} // patxitron::ui
 
-#endif // UINTSPINNER_HPP
+#endif // HPP_2dca96ac_9b86_11e7_a27d_777393114e5d
