@@ -16,42 +16,33 @@ extern "C" {
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
+#include "shutter.hpp"
 
-static void salir(Fl_Widget*,void*) { std::exit(0); }
+static void exit_callback(Fl_Widget*, void*)
+{
+    std::exit(0);
+}
+
+static void start_callback(Fl_Button* button, patxitron::nx::Shutter* shutter)
+{
+    // TODO:
+}
 
 int main(int argc, char **argv) {
-    xdo_t* xdo = xdo_new(":0");
-    Window camera_app_window = 0;
-    if (0 != xdo_get_focused_window(xdo, &camera_app_window)) {
-        std::cerr << "xdo_get_focused_window failed." << std::endl;
-        std::exit(1);
-    }
-    if (0 != xdo_send_keysequence_window_down(xdo, camera_app_window, "Super_L", 0)) {
-        std::cerr << "xdo_send_keysequence_window_down Super_L failed." << std::endl;
-        std::exit(1);
-    }
-    usleep(100000);
-    if (0 != xdo_send_keysequence_window_down(xdo, camera_app_window, "Super_R", 0)) {
-        std::cerr << "xdo_send_keysequence_window_down Super_R failed." << std::endl;
-        std::exit(1);
-    }
-    usleep(10000000);
-    if (0 != xdo_send_keysequence_window_up(xdo, camera_app_window, "Super_R", 0)) {
-        std::cerr << "xdo_send_keysequence_window_up Super_R failed." << std::endl;
-        std::exit(1);
-    }
-    usleep(100000);
-    if (0 != xdo_send_keysequence_window_up(xdo, camera_app_window, "Super_L", 0)) {
-        std::cerr << "xdo_send_keysequence_window_up Super_L failed." << std::endl;
-        std::exit(1);
-    }
     Fl_Window *window = new Fl_Window(720,480);
-    Fl_Button *button = new Fl_Button(10, 390, 700, 80, "SALIR");
-    button->callback(salir);
-    button->labelsize(60);
-    button->box(FL_BORDER_FRAME);
-    button->color(FL_RED);
-    button->labelcolor(FL_RED);
+    patxitron::nx::Shutter* shutter = new patxitron::nx::Shutter(0, 346);
+    Fl_Button *start_button = new Fl_Button(10, 306, 700, 80, "START");
+    Fl_Button *exit_button = new Fl_Button(10, 390, 700, 80, "EXIT");
+    start_button->callback(reinterpret_cast<Fl_Callback*>(&start_callback), shutter);
+    start_button->labelsize(60);
+    start_button->box(FL_BORDER_FRAME);
+    start_button->color(FL_RED);
+    start_button->labelcolor(FL_RED);
+    exit_button->callback(&exit_callback);
+    exit_button->labelsize(60);
+    exit_button->box(FL_BORDER_FRAME);
+    exit_button->color(FL_RED);
+    exit_button->labelcolor(FL_RED);
     window->color(FL_BLACK, FL_RED);
     window->fullscreen();
     window->end();

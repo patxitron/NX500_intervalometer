@@ -64,6 +64,7 @@ void Shutter::start(::std::chrono::seconds const& delay
                    ,::std::chrono::seconds const& exposure
                    ,uint16_t count)
 {
+    lock_guard<mutex> lock(mutex_);
     if (status_ == IDLE) {
         exposure_count_ = count;
         exposure_done_ = 0;
@@ -78,6 +79,7 @@ void Shutter::start(::std::chrono::seconds const& delay
 
 void Shutter::cancel()
 {
+    lock_guard<mutex> lock(mutex_);
     if (status_ != IDLE && status_ != FINISHED) {
         exposure_count_ = exposure_done_;
         if (status_ == EXPOSING) {
@@ -94,10 +96,35 @@ void Shutter::cancel()
 
 
 
+Shutter::status_t Shutter::status() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return status_;
+}
+
+
+
+chrono::milliseconds Shutter::elapsed() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - last_time_);
+}
+
+
+
+uint16_t Shutter::shoots_done() const
+{
+    lock_guard<mutex> lock(mutex_);
+    return exposure_done_;
+}
+
+
+
 void Shutter::timer_callback()
 {
     char buffer[64];
     buffer[63] = 0;
+    lock_guard<mutex> lock(mutex_);
     auto elapsed = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - last_time_);
     switch(status_) {
     case WAITING_TO_BEGIN:

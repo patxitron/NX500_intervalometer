@@ -4,6 +4,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Output.H>
 #include <stdexcept>
+#include <mutex>
 #include <memory>
 #include <chrono>
 #include <cstdlib>
@@ -46,8 +47,11 @@ public:
               ,::std::chrono::seconds const& interval
               ,::std::chrono::seconds const& exposure
               ,uint16_t count);
-
     void cancel();
+
+    status_t status() const;
+    ::std::chrono::milliseconds elapsed() const;
+    uint16_t shoots_done() const;
 
 private:
     status_t status_;
@@ -60,6 +64,7 @@ private:
     xdo_t* xdo_;
     ::std::unique_ptr<Fl_Output> status_output_;
     Window camera_app_window_;
+    mutable ::std::mutex mutex_;
 
     void timer_callback();
     static void tmrcb(Shutter* shttr);
