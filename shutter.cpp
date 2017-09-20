@@ -1,48 +1,29 @@
 #include "shutter.hpp"
 #include <FL/Fl.H>
 #include <ctime>
-#include <cstdio>
-#include <unistd.h>
+#include <iostream>
 
 using namespace std;
 
-namespace {
-
-} // Anonymous
-
-
-
 namespace patxitron { namespace nx {
 
-double const Shutter::PERIOD = .1;
+double const Shutter::PERIOD = .01;
 chrono::milliseconds const Shutter::FOCUS_TIME(100ms);
 
-Shutter::Shutter(int x, int y)
-        :Fl_Group(x, y, WIDTH, HEIGHT)
-        ,status_(IDLE)
-        ,begin_delay_(0ms)
-        ,interval_(0ms)
-        ,exposure_time_(0ms)
-        ,exposure_count_(0)
-        ,exposure_done_(0)
-        ,last_time_(chrono::steady_clock::now())
+
+
+Shutter::Shutter(callback_t* callback, void* data)
+        :exposure_(0)
+        ,last_(chrono::steady_clock::now())
+        ,callback_(callback)
+        ,data_(data)
+        ,state_(IDLE)
         ,xdo_(xdo_new(":0"))
-        ,status_output_(new Fl_Output(x + 2, y + 2, WIDTH - 4, HEIGHT - 4))
         ,camera_app_window_(CURRENTWINDOW)
 {
     if (!xdo_) throw nx_error("Can not allocate xdo_t structure.");
-    if (0 != xdo_get_focused_window(xdo_, &camera_app_window_)) {
-        throw nx_error("Can not get NX camera app window.");
-    }
-    status_output_->textsize(HEIGHT - 8);
-    status_output_->box(FL_BORDER_BOX);
-    status_output_->color(FL_BLACK);
-    status_output_->labelcolor(FL_RED);
-    status_output_->selection_color (FL_RED);
-    status_output_->textcolor(FL_RED);
-    status_output_->value("Idle.");
     Fl::add_timeout(PERIOD, reinterpret_cast<Fl_Timeout_Handler>(&Shutter::tmrcb), this);
-    end();
+    target_focus_window();
 }
 
 
@@ -50,28 +31,38 @@ Shutter::Shutter(int x, int y)
 Shutter::~Shutter()
 {
     if (xdo_) {
-        xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_R", 0);
-        usleep(10000);
-        xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_L", 0);
+        if (state_ != IDLE || state_ != FINISHED) {
+            if (state_ == EXPOSING) {
+                xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_R", 0);
+                usleep(10000);
+            }
+            xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_L", 0);
+        }
         xdo_free(xdo_);
     }
 }
 
 
 
-void Shutter::start(::std::chrono::seconds const& delay
-                   ,::std::chrono::seconds const& interval
-                   ,::std::chrono::seconds const& exposure
-                   ,uint16_t count)
+void Shutter::callback(callback_t* callback, void* data)
 {
-    lock_guard<mutex> lock(mutex_);
-    if (status_ == IDLE) {
-        exposure_count_ = count;
-        exposure_done_ = 0;
-        begin_delay_ = delay;
-        exposure_time_ = exposure;
-        interval_ = interval >= exposure + 2s ? interval : exposure + 2s;
-        status_ = WAITING_TO_BEGIN;
+    callback_ = callback;
+    data_ = data;
+}
+
+
+
+void Shutter::start(uint16_t deciseconds)
+{
+    cout << "Shutter::start(" << deciseconds << ")" << endl;
+    lock_guard<recursive_mutex> lock(mutex_);
+    if (state_ == IDLE) {
+        exposure_ = deciseconds * 100;
+        state_ = PRE_FOCUS;
+        if (0 != xdo_send_keysequence_window_down(xdo_, camera_app_window_, "Super_L", 0)) {
+            throw nx_error("Can not half-press camera shutter.");
+        }
+        last_ = chrono::steady_clock::now();
     }
 }
 
@@ -79,136 +70,87 @@ void Shutter::start(::std::chrono::seconds const& delay
 
 void Shutter::cancel()
 {
-    lock_guard<mutex> lock(mutex_);
-    if (status_ != IDLE && status_ != FINISHED) {
-        exposure_count_ = exposure_done_;
-        if (status_ == EXPOSING) {
+    lock_guard<recursive_mutex> lock(mutex_);
+    if (state_ != IDLE) {
+        if (state_ == EXPOSING) {
             if (0 != xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_R", 0)) {
                 throw nx_error("Can not half-release camera shutter.");
             }
-            last_time_ = chrono::steady_clock::now();
-            status_ = POST_EXPOSING;
+            state_ = POST_FOCUS;
+            last_ = chrono::steady_clock::now();
+        } else {
+            if (0 != xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_L", 0)) {
+                throw nx_error("Can not full-release camera shutter.");
+            }
+            state_ = FINISHED;
         }
-        status_output_->value("Cancelled.");
-        status_output_->redraw();
+    } else {
+        do_callback();
     }
 }
 
 
 
-Shutter::status_t Shutter::status() const
+void Shutter::target_focus_window()
 {
-    lock_guard<mutex> lock(mutex_);
-    return status_;
+    if (0 != xdo_get_focused_window(xdo_, &camera_app_window_)) {
+        throw nx_error("Can not get NX camera app window.");
+    }
 }
 
 
 
-chrono::milliseconds Shutter::elapsed() const
+void Shutter::target_window(Window const& w)
 {
-    lock_guard<mutex> lock(mutex_);
-    return chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - last_time_);
+    camera_app_window_ = w;
 }
 
 
 
-uint16_t Shutter::shoots_done() const
+void Shutter::do_callback()
 {
-    lock_guard<mutex> lock(mutex_);
-    return exposure_done_;
+    if (callback_) (*callback_)(this, data_);
 }
 
 
 
-void Shutter::timer_callback()
+void Shutter::iterate()
 {
-    char buffer[64];
-    buffer[63] = 0;
-    lock_guard<mutex> lock(mutex_);
-    auto elapsed = chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - last_time_);
-    switch(status_) {
-    case WAITING_TO_BEGIN:
-        if (elapsed > begin_delay_) {
-            if (0 != xdo_send_keysequence_window_down(xdo_, camera_app_window_, "Super_L", 0)) {
-                throw nx_error("Can not half-press camera shutter.");
-            }
-            last_time_ = chrono::steady_clock::now();
-            status_ = PRE_EXPOSING;
-        }
-        snprintf(
-            buffer
-           ,63
-           ,"Starting in %ds"
-           ,chrono::duration_cast<chrono::seconds>(begin_delay_ - elapsed).count()
-        );
-        status_output_->value(buffer);
-        status_output_->redraw();
-        break;
-    case WAITING_NEXT_SHOOT:
-        if (elapsed > (interval_ - exposure_time_ - 2 * FOCUS_TIME)) {
-            if (0 != xdo_send_keysequence_window_down(xdo_, camera_app_window_, "Super_L", 0)) {
-                throw nx_error("Can not half-press camera shutter.");
-            }
-            last_time_ = chrono::steady_clock::now();
-            status_ = PRE_EXPOSING;
-        }
-        snprintf(
-           buffer
-           ,63
-           ,"Next exposure in in %ds, %hu exposures left"
-           ,chrono::duration_cast<chrono::seconds>((interval_ - exposure_time_ - 2 * FOCUS_TIME) - elapsed).count()
-           ,exposure_count_ - exposure_done_
-        );
-        status_output_->value(buffer);
-        status_output_->redraw();
-        break;
-    case PRE_EXPOSING:
+    lock_guard<recursive_mutex> lock(mutex_);
+    auto elapsed = chrono::duration_cast<chrono::milliseconds>(
+        chrono::steady_clock::now() - last_
+    );
+    switch(state_) {
+    case PRE_FOCUS:
         if (elapsed > FOCUS_TIME) {
             if (0 != xdo_send_keysequence_window_down(xdo_, camera_app_window_, "Super_R", 0)) {
                 throw nx_error("Can not full-press camera shutter.");
             }
-            last_time_ = chrono::steady_clock::now();
-            status_ = EXPOSING;
+            state_ = EXPOSING;
+            last_ = chrono::steady_clock::now();
         }
         break;
     case EXPOSING:
-        if (elapsed > exposure_time_) {
+        if (elapsed.count() > exposure_) {
             if (0 != xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_R", 0)) {
                 throw nx_error("Can not half-release camera shutter.");
             }
-            last_time_ = chrono::steady_clock::now();
-            status_ = POST_EXPOSING;
+            state_ = POST_FOCUS;
+            last_ = chrono::steady_clock::now();
         }
-        snprintf(
-           buffer
-           ,63
-           ,"Exposing %ds, %d to go, %hu exposures left"
-           ,chrono::duration_cast<chrono::seconds>(elapsed).count()
-           ,chrono::duration_cast<chrono::seconds>(exposure_time_ - elapsed).count()
-           ,exposure_count_ - exposure_done_
-        );
-        status_output_->value(buffer);
-        status_output_->redraw();
         break;
-    case POST_EXPOSING:
+    case POST_FOCUS:
         if (elapsed > FOCUS_TIME) {
             if (0 != xdo_send_keysequence_window_up(xdo_, camera_app_window_, "Super_L", 0)) {
                 throw nx_error("Can not full-release camera shutter.");
             }
-            last_time_ = chrono::steady_clock::now();
-            if (exposure_count_ > exposure_done_) {
-                exposure_done_ += 1;
-                status_ = WAITING_NEXT_SHOOT;
-            } else {
-                status_ = FINISHED;
-            }
+            state_ = FINISHED;
         }
         break;
     case FINISHED:
-        status_ = IDLE;
-        status_output_->value("Finished.");
-        status_output_->redraw();
         do_callback();
+        state_ = IDLE;
+        break;
     default:
         break;
     }
@@ -218,7 +160,7 @@ void Shutter::timer_callback()
 
 void Shutter::tmrcb(Shutter* shttr)
 {
-    shttr->timer_callback();
+    shttr->iterate();
     Fl::repeat_timeout(PERIOD, reinterpret_cast<Fl_Timeout_Handler>(&Shutter::tmrcb), shttr);
 }
 

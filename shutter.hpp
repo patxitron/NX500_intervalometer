@@ -1,11 +1,8 @@
-#ifndef HPP_9fcd8480_9b86_11e7_9598_379b686877e8
-#define HPP_9fcd8480_9b86_11e7_9598_379b686877e8
+#ifndef HPP_288a28e0_9dd6_11e7_8aa5_082e5f016151
+#define HPP_288a28e0_9dd6_11e7_8aa5_082e5f016151
 
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Output.H>
-#include <stdexcept>
 #include <mutex>
-#include <memory>
+#include <stdexcept>
 #include <chrono>
 #include <cstdlib>
 #include <stdint.h>
@@ -22,54 +19,62 @@ struct nx_error: public ::std::runtime_error
 
 
 
-class Shutter: public Fl_Group
+class Shutter
 {
 public:
     typedef enum {
         IDLE,
-        WAITING_TO_BEGIN,
-        WAITING_NEXT_SHOOT,
-        PRE_EXPOSING,
+        PRE_FOCUS,
         EXPOSING,
-        POST_EXPOSING,
+        POST_FOCUS,
         FINISHED
-    } status_t;
+    } state_t;
+    typedef void(callback_t)(Shutter*,void*);
 
-    static int const WIDTH = 700;
-    static int const HEIGHT = 40;
     static double const PERIOD;
     static ::std::chrono::milliseconds const FOCUS_TIME;
 
-    Shutter(int x, int y);
+    explicit Shutter(callback_t* callback=nullptr, void* data=nullptr);
+    Shutter(Shutter const&) = delete;
     ~Shutter();
 
-    void start(::std::chrono::seconds const& delay
-              ,::std::chrono::seconds const& interval
-              ,::std::chrono::seconds const& exposure
-              ,uint16_t count);
-    void cancel();
+    Shutter& operator=(Shutter const&) = delete;
 
-    status_t status() const;
-    ::std::chrono::milliseconds elapsed() const;
-    uint16_t shoots_done() const;
+    void callback(callback_t* callback, void* data=nullptr);
+    state_t state() const
+    {
+        ::std::lock_guard<::std::recursive_mutex> lock(mutex_);
+        return state_;
+    }
+    ssize_t exposing() const
+    {
+        ::std::lock_guard<::std::recursive_mutex> lock(mutex_);
+        if (state_ == IDLE) return -1;
+        return ::std::chrono::duration_cast<::std::chrono::seconds>(
+            ::std::chrono::steady_clock::now() - last_
+        ).count();
+    }
+    void start(uint16_t deciseconds);
+    void cancel();
+    void target_focus_window();
+    void target_window(Window const& w);
+    Window target_window() const {return camera_app_window_;}
 
 private:
-    status_t status_;
-    ::std::chrono::milliseconds begin_delay_;
-    ::std::chrono::milliseconds interval_;
-    ::std::chrono::milliseconds exposure_time_;
-    uint16_t exposure_count_;
-    uint16_t exposure_done_;
-    ::std::chrono::time_point<::std::chrono::steady_clock> last_time_;
+    int32_t exposure_;
+    ::std::chrono::time_point<::std::chrono::steady_clock> last_;
+    callback_t* callback_;
+    void* data_;
+    state_t state_;
     xdo_t* xdo_;
-    ::std::unique_ptr<Fl_Output> status_output_;
     Window camera_app_window_;
-    mutable ::std::mutex mutex_;
+    mutable ::std::recursive_mutex mutex_;
 
-    void timer_callback();
+    void do_callback();
+    void iterate();
     static void tmrcb(Shutter* shttr);
 };
 
 }} // patxitron::nx
 
-#endif // HPP_9fcd8480_9b86_11e7_9598_379b686877e8
+#endif // HPP_288a28e0_9dd6_11e7_8aa5_082e5f016151

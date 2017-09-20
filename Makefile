@@ -12,7 +12,7 @@ DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
 CXX := $(COMPILER_PREFIX)g++
 
-OBJS := main.o spinner.o uintspinner.o shutter.o
+OBJS := main.o spinner.o uintspinner.o intervalometer.o shutter.o
 LIBS = xdotool/libxdo.a $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a \
        $(SYSROOT)/usr/lib/libfltk.a $(SYSROOT)/usr/lib/libfltk_forms.a \
        $(SYSROOT)/usr/lib/libfltk_images.a $(SYSROOT)/usr/lib/libXft.a \

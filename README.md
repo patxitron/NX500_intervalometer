@@ -16,6 +16,13 @@ in ubuntu:
 sudo apt install linux-libc-dev:i386
 ```
 
+## Known issues
+
+Up/down arrows in spinners don't show in camera screen (they do if I compile and
+execute in my Ubuntu development machine).
+
+Status line has some bugs in the info it shows.
+
 ## NX Key mapping to xdo_send_keysequence_window* functions:
 
 |NX KEY|key name||

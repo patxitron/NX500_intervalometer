@@ -17,7 +17,6 @@ static uint16_t spinners_value(::std::vector<::std::unique_ptr<patxitron::ui::Sp
         result += v->value() * factor;
         factor *= 10;
     }
-    cout << "spinners_value(): " << result << endl;
     return result;
 }
 
@@ -26,26 +25,30 @@ static uint16_t spinners_value(::std::vector<::std::unique_ptr<patxitron::ui::Sp
 namespace patxitron { namespace ui {
 
 UintSpinner::UintSpinner(int x, int y, uint16_t minval, uint16_t maxval
-                        ,uint16_t val)
-        :Fl_Group(x, y, Spinner::WIDTH * static_cast<uint16_t>(log10(maxval) + 1), Spinner::HEIGHT)
+                        ,char const* label, uint16_t val)
+        :Fl_Group(x, y, Spinner::WIDTH * static_cast<uint16_t>(log10(maxval) + 1), Spinner::HEIGHT + 28)
         ,value_(val < minval ? minval : (val > maxval ? maxval : val))
         ,max_(maxval)
         ,min_(minval)
         ,order_(static_cast<uint16_t>(log10(max_)) + 1)
+        ,label_(new Fl_Output(x, y + 2, Spinner::WIDTH * static_cast<uint16_t>(log10(max_) + 1), 26))
 {
+    label_->box(FL_BORDER_BOX);
+    label_->color(FL_BLACK);
+    label_->labelcolor(FL_DARK_RED);
+    label_->selection_color (FL_DARK_RED);
+    label_->textsize(24);
+    label_->textcolor(FL_DARK_RED);
+    label_->value(label);
     strncpy(fmt_, "%00hu", 6);
     fmt_[2] = static_cast<char>(order_) + '0';
     char buffer[6];
     snprintf(buffer, 6, fmt_, val);
     for (ssize_t i = order_ - 1; i >= 0; i--) {
-        Spinner* spinner = new Spinner(x + i * Spinner::WIDTH, y, buffer[i] - '0');
+        Spinner* spinner = new Spinner(x + i * Spinner::WIDTH, y + 28, buffer[i] - '0');
         spinners_.emplace_back(spinner);
         spinners_.back()->callback(&UintSpinner::spinner_cb, this);
     }
-    cout << "UintSpinner::UintSpinner(" << x << ", " << y << ", " << minval
-         << ", " << maxval << ", " << val << ") initial value: '"
-         << spinners_value(spinners_) << "', w: "
-         << Spinner::WIDTH * static_cast<uint16_t>(log10(maxval) + 1) << endl;
     end();
 }
 
@@ -53,7 +56,6 @@ UintSpinner::UintSpinner(int x, int y, uint16_t minval, uint16_t maxval
 
 uint16_t UintSpinner::value(uint16_t val)
 {
-    cout << "UintSpinner::value(" << val << ")" << endl;
     if (val > max_) val = max_;
     if (val < min_) val = min_;
     value_ = val;
@@ -64,6 +66,14 @@ uint16_t UintSpinner::value(uint16_t val)
     }
     do_callback();
     return value_;
+}
+
+
+
+void UintSpinner::min(uint16_t val)
+{
+    min_ = val;
+    if (value_ < min_) util::ignore_result(value(min_));
 }
 
 
@@ -87,14 +97,12 @@ uint16_t UintSpinner::decrement()
 void UintSpinner::spinnercb()
 {
     util::ignore_result(value(spinners_value(spinners_)));
-    cout << "UintSpinner::spinnercb(): " << value_ << endl;
 }
 
 
 
 void UintSpinner::spinner_cb(Fl_Widget* cb, void* p)
 {
-    cout << "UintSpinner::spinner_cb()" << endl;
     reinterpret_cast<UintSpinner*>(p)->spinnercb();
 }
 

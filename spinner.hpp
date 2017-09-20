@@ -18,8 +18,8 @@ namespace patxitron { namespace ui {
 class Spinner: public Fl_Group
 {
 public:
-    static unsigned int const WIDTH = 36;
-    static unsigned int const HEIGHT = 100;
+    static unsigned int const WIDTH = 56;
+    static unsigned int const HEIGHT = 122;
 
     Spinner(int x, int y, size_t val=0);
 

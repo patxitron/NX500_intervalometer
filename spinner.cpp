@@ -9,53 +9,69 @@ using namespace std;
 namespace {
 
 static char const* const up_xpm[] = {
-    "32 17 4 1",
+    "48 25 4 1",
     "  c black",
-    "o c #ff0000",
+    "o c #800000",
     "@ c #ffffff",
     "# c None",
-    "################################",
-    "###############oo###############",
-    "##############oooo##############",
-    "#############oooooo#############",
-    "############oooooooo############",
-    "###########oooooooooo###########",
-    "##########oooooooooooo##########",
-    "#########oooooooooooooo#########",
-    "########oooooooooooooooo########",
-    "#######oooooooooooooooooo#######",
-    "######oooooooooooooooooooo######",
-    "#####oooooooooooooooooooooo#####",
-    "####oooooooooooooooooooooooo####",
-    "###oooooooooooooooooooooooooo###",
-    "##oooooooooooooooooooooooooooo##",
-    "#oooooooooooooooooooooooooooooo#",
-    "################################"
+    "################################################",
+    "#######################oo#######################",
+    "######################oooo######################",
+    "#####################oooooo#####################",
+    "####################oooooooo####################",
+    "###################oooooooooo###################",
+    "##################oooooooooooo##################",
+    "#################oooooooooooooo#################",
+    "################oooooooooooooooo################",
+    "###############oooooooooooooooooo###############",
+    "##############oooooooooooooooooooo##############",
+    "#############oooooooooooooooooooooo#############",
+    "############oooooooooooooooooooooooo############",
+    "###########oooooooooooooooooooooooooo###########",
+    "##########oooooooooooooooooooooooooooo##########",
+    "#########oooooooooooooooooooooooooooooo#########",
+    "########oooooooooooooooooooooooooooooooo########",
+    "#######oooooooooooooooooooooooooooooooooo#######",
+    "######oooooooooooooooooooooooooooooooooooo######",
+    "#####oooooooooooooooooooooooooooooooooooooo#####",
+    "####oooooooooooooooooooooooooooooooooooooooo####",
+    "###oooooooooooooooooooooooooooooooooooooooooo###",
+    "##oooooooooooooooooooooooooooooooooooooooooooo##",
+    "#oooooooooooooooooooooooooooooooooooooooooooooo#",
+    "################################################"
 };
 
 static char const* const down_xpm[] = {
-    "32 17 4 1",
+    "48 25 4 1",
     "  c black",
-    "o c #ff0000",
+    "o c #800000",
     "@ c #ffffff",
     "# c None",
-    "################################",
-    "#oooooooooooooooooooooooooooooo#",
-    "##oooooooooooooooooooooooooooo##",
-    "###oooooooooooooooooooooooooo###",
-    "####oooooooooooooooooooooooo####",
-    "#####oooooooooooooooooooooo#####",
-    "######oooooooooooooooooooo######",
-    "#######oooooooooooooooooo#######",
-    "########oooooooooooooooo########",
-    "#########oooooooooooooo#########",
-    "##########oooooooooooo##########",
-    "###########oooooooooo###########",
-    "############oooooooo############",
-    "#############oooooo#############",
-    "##############oooo##############",
-    "###############oo###############",
-    "################################"
+    "################################################",
+    "#oooooooooooooooooooooooooooooooooooooooooooooo#",
+    "##oooooooooooooooooooooooooooooooooooooooooooo##",
+    "###oooooooooooooooooooooooooooooooooooooooooo###",
+    "####oooooooooooooooooooooooooooooooooooooooo####",
+    "#####oooooooooooooooooooooooooooooooooooooo#####",
+    "######oooooooooooooooooooooooooooooooooooo######",
+    "#######oooooooooooooooooooooooooooooooooo#######",
+    "########oooooooooooooooooooooooooooooooo########",
+    "#########oooooooooooooooooooooooooooooo#########",
+    "##########oooooooooooooooooooooooooooo##########",
+    "###########oooooooooooooooooooooooooo###########",
+    "############oooooooooooooooooooooooo############",
+    "#############oooooooooooooooooooooo#############",
+    "##############oooooooooooooooooooo##############",
+    "###############oooooooooooooooooo###############",
+    "################oooooooooooooooo################",
+    "#################oooooooooooooo#################",
+    "##################oooooooooooo##################",
+    "###################oooooooooo###################",
+    "####################oooooooo####################",
+    "#####################oooooo#####################",
+    "######################oooo######################",
+    "#######################oo#######################",
+    "################################################"
 };
 
 static Fl_Pixmap  up_arrow(up_xpm);
@@ -67,9 +83,9 @@ namespace patxitron { namespace ui {
 
 Spinner::Spinner(int x, int y, size_t val)
         :Fl_Group(x, y, WIDTH, HEIGHT)
-        ,button_up_(new Fl_Button(x + 2, y + 1, 32, 17))
-        ,button_down_(new Fl_Button(x + 2, y + 82, 32, 17))
-        ,value_(new Fl_Output(x + 2, y + 18, 32, 64))
+        ,button_up_(new Fl_Button(x + 4, y + 1, 48, 25))
+        ,button_down_(new Fl_Button(x + 4, y + 96, 48, 25))
+        ,value_(new Fl_Output(x + 4, y + 26, 48, 70))
 {
     char v[] = {'0', 0};
     if (val > 9) val = 9;
@@ -84,13 +100,12 @@ Spinner::Spinner(int x, int y, size_t val)
     button_down_->box(FL_FLAT_BOX);
     value_->box(FL_BORDER_BOX);
     value_->color(FL_BLACK);
-    value_->labelcolor(FL_RED);
-    value_->selection_color (FL_RED);
-    value_->textsize(46);
-    value_->textcolor(FL_RED);
+    value_->labelcolor(FL_DARK_RED);
+    value_->selection_color (FL_DARK_RED);
+    value_->textsize(68);
+    value_->textcolor(FL_DARK_RED);
     value_->value(v);
     value_->redraw();
-    cout << "Spinner::Spinner() initial value: '" << value_->value() << "'" << endl;
     end();
 }
 
@@ -101,7 +116,6 @@ void Spinner::value(size_t val)
     char v[] = {static_cast<char>(val <= 9 ? val + '0' : '0'), 0};
     value_->value(v);
     value_->redraw();
-    cout << "Spinner::value(): '" << value_->value() << "'" << endl;
 }
 
 
@@ -113,7 +127,6 @@ size_t Spinner::increment()
     if (v[0] > '9') v[0] = '0';
     value_->value(v);
     value_->redraw();
-    cout << "Spinner::increment(): '" << value_->value() << "'" << endl;
     return static_cast<size_t>(value_->value()[0] - '0');
 }
 
@@ -126,7 +139,6 @@ size_t Spinner::decrement()
     if (v[0] < '0') v[0] = '9';
     value_->value(v);
     value_->redraw();
-    cout << "Spinner::decrement(): '" << value_->value() << "'" << endl;
     return static_cast<size_t>(value_->value()[0] - '0');
 }
 
@@ -134,7 +146,6 @@ size_t Spinner::decrement()
 
 void Spinner::upcbk(Fl_Widget*, Spinner* spnr)
 {
-    cout << "Spinner::upcbk()" << endl;
     util::ignore_result(spnr->increment());
     spnr->do_callback();
 }
@@ -143,7 +154,6 @@ void Spinner::upcbk(Fl_Widget*, Spinner* spnr)
 
 void Spinner::downcbk(Fl_Widget*, Spinner* spnr)
 {
-    cout << "Spinner::downcbk()" << endl;
     util::ignore_result(spnr->decrement());
     spnr->do_callback();
 }
