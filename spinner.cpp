@@ -9,11 +9,9 @@ using namespace std;
 namespace {
 
 static char const* const up_xpm[] = {
-    "48 25 4 1",
-    "  c black",
-    "o c #800000",
-    "@ c #ffffff",
-    "# c None",
+    "48 25 2 1",
+    "o c None",
+    "# c #ff0000",
     "################################################",
     "#######################oo#######################",
     "######################oooo######################",
@@ -42,11 +40,9 @@ static char const* const up_xpm[] = {
 };
 
 static char const* const down_xpm[] = {
-    "48 25 4 1",
-    "  c black",
-    "o c #800000",
-    "@ c #ffffff",
-    "# c None",
+    "48 25 2 1",
+    "o c None",
+    "# c #ff0000",
     "################################################",
     "#oooooooooooooooooooooooooooooooooooooooooooooo#",
     "##oooooooooooooooooooooooooooooooooooooooooooo##",
@@ -92,12 +88,14 @@ Spinner::Spinner(int x, int y, size_t val)
     v[0] = val + '0';
     button_up_->callback(reinterpret_cast<Fl_Callback*>(&Spinner::upcbk), this);
     button_down_->callback(reinterpret_cast<Fl_Callback*>(&Spinner::downcbk), this);
-    button_up_->image(up_arrow);
-    button_down_->image(down_arrow);
-    button_up_->color(FL_BLACK);
-    button_down_->color(FL_BLACK);
+    button_up_->color(FL_DARK_RED);
+    button_down_->color(FL_DARK_RED);
     button_up_->box(FL_FLAT_BOX);
     button_down_->box(FL_FLAT_BOX);
+    button_up_->image(up_arrow);
+    button_down_->image(down_arrow);
+    button_up_->redraw();
+    button_down_->redraw();
     value_->box(FL_BORDER_BOX);
     value_->color(FL_BLACK);
     value_->labelcolor(FL_DARK_RED);

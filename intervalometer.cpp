@@ -102,29 +102,42 @@ void Intervalometer::iterate()
 
 void Intervalometer::update_status()
 {
-    static char buffer[64];
+    char buffer[64];
     buffer[63] = 0;
     if (state_ == EXPOSING) {
         ssize_t exp = shutter_.exposing();
         snprintf(
              buffer
             ,63
-            ,"Exposing %lds / %hus, %hu done %hu to go"
+            ,"Exposing %lds / %hus, %hu of %hu done"
             ,exp
             ,exposure_->value() / 10
             ,counter_
             ,count_->value()
         );
     } else {
-        snprintf(
-             buffer
-            ,63
-            ,"Waiting %lds / %hus, %hu done %hu to go"
-            ,chrono::duration_cast<chrono::seconds>(chrono::steady_clock::now() - last_).count()
-            ,state_ == WAITING_START ? delay_->value() : interval_->value()
-            ,counter_
-            ,count_->value()
-        );
+        ssize_t wt = chrono::duration_cast<chrono::seconds>(chrono::steady_clock::now() - last_).count();
+        if (state_ == WAITING_START) {
+            snprintf(
+                 buffer
+                ,63
+                ,"Waiting %lds / %hus, %hu of %hu done"
+                ,wt
+                ,delay_->value()
+                ,counter_
+                ,count_->value()
+            );
+        } else {
+            snprintf(
+                 buffer
+                ,63
+                ,"Waiting %lds / %hus, %hu of %hu done"
+                ,wt
+                ,interval_->value()
+                ,counter_
+                ,count_->value()
+            );
+        }
     }
     status_->value(buffer);
     status_->redraw();

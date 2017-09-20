@@ -57,7 +57,7 @@ void Shutter::start(uint16_t deciseconds)
     cout << "Shutter::start(" << deciseconds << ")" << endl;
     lock_guard<recursive_mutex> lock(mutex_);
     if (state_ == IDLE) {
-        exposure_ = deciseconds * 100;
+        exposure_ = deciseconds * 100 + 125;
         state_ = PRE_FOCUS;
         if (0 != xdo_send_keysequence_window_down(xdo_, camera_app_window_, "Super_L", 0)) {
             throw nx_error("Can not half-press camera shutter.");

@@ -7,7 +7,7 @@ STRIP = $(COMPILER_PREFIX)strip
 STRIPFLAGS = --strip-all
 CXXFLAGS = -std=c++14 -pedantic -Wall -Wno-format -fmessage-length=0 -static \
            -I $(PROJECT_DIR)/xdotool -I $(SYSROOT)/usr/include
-OPTFLAGS = -O2
+OPTFLAGS = -Os
 DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
 CXX := $(COMPILER_PREFIX)g++
