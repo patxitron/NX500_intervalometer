@@ -6,7 +6,8 @@ FLKTCONFIG := $(SYSROOT)/usr/bin/fltk-config
 STRIP = $(COMPILER_PREFIX)strip
 STRIPFLAGS = --strip-all
 CXXFLAGS = -std=c++14 -pedantic -Wall -Wno-format -fmessage-length=0 -static \
-           -I $(PROJECT_DIR)/xdotool -I $(SYSROOT)/usr/include
+           -I $(PROJECT_DIR)/xdotool -I $(PROJECT_DIR)/beast/include \
+           -I $(SYSROOT)/usr/include
 OPTFLAGS = -Os
 DBGFLAGS = -O0 -g -DDEBUG
 LDFLAGS = -static
@@ -40,11 +41,14 @@ release: CXXFLAGS := $(OPTFLAGS) $(CXXFLAGS)
 release: $(TARGET)
 	$(STRIP) $(STRIPFLAGS) $(TARGET)
 
-$(TARGET): $(STRIP) $(PROJECT_DIR)/xdotool/libxdo.a $(OBJS)
+$(TARGET): $(STRIP) $(PROJECT_DIR)/xdotool/libxdo.a $(PROJECT_DIR)/beast/include/boost/beast.hpp $(OBJS)
 	$(CXX) -o $(TARGET) $(LDFLAGS) $(OBJS) $(LIBS)
 
 $(PROJECT_DIR)/xdotool/libxdo.a:
 	$(PROJECT_DIR)/build-libxdo.sh
+
+$(PROJECT_DIR)/beast/include/boost/beast.hpp:
+	$(PROJECT_DIR)/do-beast.sh
 
 $(STRIP):
 	$(PROJECT_DIR)/do-buildroot.sh
