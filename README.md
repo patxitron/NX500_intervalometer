@@ -16,6 +16,12 @@ in ubuntu:
 sudo apt install linux-libc-dev:i386
 ```
 
+## Work in progress
+
+This master branch contains new experimental code the main goal is to make the
+intervalometer remote controlled via web application. The first working, no remote
+controlled application is in v1 branch.
+
 # Camera modding information
 
 This info is a brief compilation of information from
