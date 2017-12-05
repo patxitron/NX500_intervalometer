@@ -28,7 +28,8 @@ DEFINES = -D_BSD_SOURCE -DAPP_NAME="\"$(TARGET)\"" \
           -DAPP_VERSION="\"$(APP_VERSION)\"" \
           -DAPP_GIT_COMMIT="\"$(APP_GIT_COMMIT)\""
 
-SRCFILES := main.cpp spinner.cpp uintspinner.cpp intervalometer.cpp shutter.cpp
+SRCFILES := main.cpp spinner.cpp uintspinner.cpp intervalometer-ui.cpp shutter.cpp \
+            daemon.cpp setup-ui.cpp
 SOURCES := $(patsubst %.cpp,src/%.cpp,$(SRCFILES))
 OBJS := $(patsubst %.cpp,build/%.o,$(SRCFILES))
 LIBS = xdotool/libxdo.a $(SYSROOT)/lib/libc.a $(SYSROOT)/usr/lib/libstdc++.a \

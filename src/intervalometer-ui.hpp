@@ -18,14 +18,14 @@
 
 namespace patxitron {
 
-struct Intervalometer_error: public ::std::runtime_error
+struct IntervalometerUi_error: public ::std::runtime_error
 {
-    Intervalometer_error(::std::string const& what): ::std::runtime_error(what) {}
+    IntervalometerUi_error(::std::string const& what): ::std::runtime_error(what) {}
 };
 
 
 
-class Intervalometer: public Fl_Group
+class IntervalometerUi: public Fl_Group
 {
 public:
     typedef enum {
@@ -41,7 +41,7 @@ public:
     static unsigned int const WIDTH = 720;
     static unsigned int const HEIGHT = 390;
 
-    Intervalometer();
+    IntervalometerUi();
 
     void cancel();
 
@@ -61,10 +61,10 @@ private:
 
     void iterate();
     void update_status();
-    static void exposure_cb(Fl_Widget*, Intervalometer* self);
-    static void start_cb(Fl_Widget*, Intervalometer* self);
-    static void tmrcb(Intervalometer* self);
-    static void shutter_cb(nx::Shutter*, Intervalometer* self);
+    static void exposure_cb(Fl_Widget*, IntervalometerUi* self);
+    static void start_cb(Fl_Widget*, IntervalometerUi* self);
+    static void tmrcb(IntervalometerUi* self);
+    static void shutter_cb(nx::Shutter*, IntervalometerUi* self);
 };
 
 } // patxitron

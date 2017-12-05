@@ -170,7 +170,12 @@ daemonize_result daemonize(::std::string const& daemon_name
     }
 
     forked_func(::std::forward<ARGS>(args)...);
-    exit(0); // Exit when the function returns.
+    // Remove pid file and exit when the function returns.
+    usleep(30000);
+    if (!pid_file_name.empty()) {
+        unlink(pid_file_name.c_str());
+    }
+    exit(0);
     return DAEMON_ERROR; // Placed here to make some compilers happy.
 }
 

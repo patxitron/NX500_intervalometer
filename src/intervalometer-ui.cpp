@@ -1,4 +1,4 @@
-#include "intervalometer.hpp"
+#include "intervalometer-ui.hpp"
 #include <FL/Fl.H>
 #include <iostream>
 #include <cstdio>
@@ -7,11 +7,11 @@ using namespace std;
 
 namespace patxitron {
 
-double const Intervalometer::PERIOD = .25;
+double const IntervalometerUi::PERIOD = .25;
 
 
 
-Intervalometer::Intervalometer()
+IntervalometerUi::IntervalometerUi()
         :Fl_Group(0, 0, WIDTH, HEIGHT)
         ,exposure_(new ui::UintSpinner(10, 10, 10, 4800, "Exposure (1/10s)", 100))
         ,count_(new ui::UintSpinner(WIDTH / 2 + 10, 10, 1, 9999, "Count", 1))
@@ -22,13 +22,13 @@ Intervalometer::Intervalometer()
         ,last_(chrono::steady_clock::now())
         ,counter_(0)
         ,state_(IDLE)
-        ,shutter_(reinterpret_cast<nx::Shutter::callback_t*>(&Intervalometer::shutter_cb), this)
+        ,shutter_(reinterpret_cast<nx::Shutter::callback_t*>(&IntervalometerUi::shutter_cb), this)
 {
     if (!exposure_ || !count_ || !delay_ || !interval_) {
-        throw Intervalometer_error("Error allocating spinners");
+        throw IntervalometerUi_error("Error allocating spinners");
     }
-    start_->callback(reinterpret_cast<Fl_Callback*>(&Intervalometer::start_cb), this);
-    exposure_->callback(reinterpret_cast<Fl_Callback*>(&Intervalometer::exposure_cb), this);
+    start_->callback(reinterpret_cast<Fl_Callback*>(&IntervalometerUi::start_cb), this);
+    exposure_->callback(reinterpret_cast<Fl_Callback*>(&IntervalometerUi::exposure_cb), this);
     start_->labelsize(start_->h() - 2);
     start_->box(FL_BORDER_FRAME);
     start_->color(FL_DARK_RED);
@@ -43,12 +43,12 @@ Intervalometer::Intervalometer()
     status_->value("Status line");
     status_->hide();
     end();
-    Fl::add_timeout(PERIOD, reinterpret_cast<Fl_Timeout_Handler>(&Intervalometer::tmrcb), this);
+    Fl::add_timeout(PERIOD, reinterpret_cast<Fl_Timeout_Handler>(&IntervalometerUi::tmrcb), this);
 }
 
 
 
-void Intervalometer::cancel()
+void IntervalometerUi::cancel()
 {
     lock_guard<recursive_mutex> lock(mutex_);
     if (state_ != IDLE) {
@@ -63,7 +63,7 @@ void Intervalometer::cancel()
 
 
 
-void Intervalometer::iterate()
+void IntervalometerUi::iterate()
 {
     lock_guard<recursive_mutex> lock(mutex_);
     auto elapsed = chrono::duration_cast<chrono::milliseconds>(
@@ -90,7 +90,7 @@ void Intervalometer::iterate()
         update_status();
         break;
     case FINISHED:
-        cout << "Intervalometer FINISHED" << endl;
+        cout << "IntervalometerUi FINISHED" << endl;
         do_callback();
         break;
     default:
@@ -100,7 +100,7 @@ void Intervalometer::iterate()
 
 
 
-void Intervalometer::update_status()
+void IntervalometerUi::update_status()
 {
     char buffer[64];
     buffer[63] = 0;
@@ -145,7 +145,7 @@ void Intervalometer::update_status()
 
 
 
-void Intervalometer::exposure_cb(Fl_Widget*, Intervalometer* self)
+void IntervalometerUi::exposure_cb(Fl_Widget*, IntervalometerUi* self)
 {
     lock_guard<recursive_mutex> lock(self->mutex_);
     self->interval_->min(self->exposure_->value() / 10 + (self->exposure_->value() % 10 ? 2 : 1));
@@ -153,9 +153,9 @@ void Intervalometer::exposure_cb(Fl_Widget*, Intervalometer* self)
 
 
 
-void Intervalometer::start_cb(Fl_Widget*, Intervalometer* self)
+void IntervalometerUi::start_cb(Fl_Widget*, IntervalometerUi* self)
 {
-    cout << "Intervalometer STARTING" << endl;
+    cout << "IntervalometerUi STARTING" << endl;
     lock_guard<recursive_mutex> lock(self->mutex_);
     if (self->state_ == IDLE) {
         self->start_->hide();
@@ -172,15 +172,15 @@ void Intervalometer::start_cb(Fl_Widget*, Intervalometer* self)
 
 
 
-void Intervalometer::tmrcb(Intervalometer* self)
+void IntervalometerUi::tmrcb(IntervalometerUi* self)
 {
     self->iterate();
-    Fl::repeat_timeout(PERIOD, reinterpret_cast<Fl_Timeout_Handler>(&Intervalometer::tmrcb), self);
+    Fl::repeat_timeout(PERIOD, reinterpret_cast<Fl_Timeout_Handler>(&IntervalometerUi::tmrcb), self);
 }
 
 
 
-void Intervalometer::shutter_cb(nx::Shutter*, Intervalometer* self)
+void IntervalometerUi::shutter_cb(nx::Shutter*, IntervalometerUi* self)
 {
     lock_guard<recursive_mutex> lock(self->mutex_);
     self->counter_ += 1;
